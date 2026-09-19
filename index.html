@@ -1,1 +1,47 @@
-<!doctype html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Xyroz — Produk Digital</title><link rel="stylesheet" href="style.css"></head><body><nav><a class="logo" href="index.html"><b>X</b>yroz</a><div><a href="#produk">Produk</a><a href="#pesan">Pesan</a><a class="btn" href="owner.html">Owner</a></div></nav><header class="hero"><div><small>XYROZ DIGITAL STORE</small><h1>Produk digital modern untuk kebutuhanmu.</h1><p>Temukan bot WhatsApp dan layanan digital siap pakai dengan proses pemesanan yang mudah.</p><a class="btn" href="#produk">Lihat Produk</a></div><div class="hero-art">X<span>yroz</span></div></header><main><section id="produk"><small>KATALOG</small><h2>Pilih produk favoritmu</h2><div id="products" class="grid"></div></section><section id="pesan" class="order"><div><small>PEMBAYARAN</small><h2>Pesan dengan mudah</h2><p>DANA: <b>085177961224</b><br>GoPay: <b>085789963681</b></p><p>Transfer sesuai harga produk, lalu isi formulir. Kami akan menghubungi melalui WhatsApp.</p></div><form action="https://formsubmit.co/emailpribhanzz@gmail.com" method="POST"><input type="hidden" name="_subject" value="Pesanan Baru Xyroz"><input type="hidden" name="_captcha" value="false"><input name="Nama" placeholder="Nama lengkap" required><input name="WhatsApp" placeholder="Nomor WhatsApp" required><select id="productSelect" name="Produk" required><option value="">Pilih produk</option></select><select name="Pembayaran" required><option value="">Metode pembayaran</option><option>DANA</option><option>GoPay</option></select><textarea name="Catatan" placeholder="Catatan tambahan"></textarea><button class="btn" type="submit">Kirim Pesanan</button></form></section></main><footer>© 2026 Xyroz · <a href="https://wa.me/6285177356154">WhatsApp Owner</a> · <a href="mailto:emailpribhanzz@gmail.com">Email</a></footer><script src="script.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xyroz — Produk Digital Premium</title>
+  <meta name="description" content="Belanja produk digital premium di Xyroz." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar"><div class="container nav-wrap">
+    <a class="brand" href="#top"><span class="brand-mark">X</span><span>yroz</span></a>
+    <nav class="nav-menu"><a href="#catalog">Produk</a><a href="#checkout">Checkout</a><a href="#contact">Kontak</a></nav>
+    <a class="nav-button" href="owner.html">Owner</a>
+  </div></header>
+
+  <main id="top">
+    <section class="hero"><div class="container hero-grid"><div class="hero-copy">
+      <span class="eyebrow">Toko digital modern</span>
+      <h1>Produk unggulan untuk kebutuhan bisnis Anda.</h1>
+      <p>Temukan layanan digital premium yang siap membantu bisnis Anda tumbuh lebih cepat, praktis, dan aman.</p>
+      <div class="hero-actions"><a class="primary-btn" href="#catalog">Lihat Produk</a><a class="secondary-btn" href="#checkout">Pesan Sekarang</a></div>
+      <ul class="feature-list"><li>Produk siap pakai</li><li>Transaksi cepat</li><li>Dukungan responsif</li></ul>
+    </div><div class="hero-visual"><div class="visual-card large"><span class="badge">Best Seller</span><div class="visual-art">✦</div><strong>Solusi Digital<br/>Premium</strong></div><div class="visual-card small"><span class="mini-tag">Xyroz</span><div class="visual-art mini">◈</div></div></div></div></section>
+
+    <section id="catalog" class="catalog-section"><div class="container">
+      <div class="section-head"><div><span class="eyebrow muted">Catalog</span><h2>Pilih produk yang Anda butuhkan</h2></div></div>
+      <div class="toolbar"><input id="searchInput" type="search" placeholder="Cari produk..." aria-label="Cari produk" /><select id="categoryFilter" aria-label="Filter kategori"><option value="all">Semua Kategori</option></select></div>
+      <div id="productGrid" class="product-grid" aria-live="polite"></div>
+    </div></section>
+
+    <section id="productDetail" class="detail-section"><div class="container detail-layout"><div id="detailImage" class="detail-image"></div><div class="detail-copy"><span id="detailCategory" class="eyebrow muted">Pilih produk</span><h3 id="detailName">Belum ada produk dipilih</h3><div id="detailPrice" class="detail-price">Rp 0</div><p id="detailDescription">Pilih salah satu produk dari katalog untuk melihat detail dan melanjutkan pemesanan.</p><div class="detail-meta"><span><strong>Status:</strong> <span id="detailStock">Ready</span></span><span><strong>Format:</strong> <span id="detailFormat">Digital</span></span></div><button id="selectProductBtn" class="primary-btn" type="button">Pilih Produk Ini</button></div></div></section>
+
+    <section id="checkout" class="checkout-section"><div class="container checkout-grid">
+      <div class="payment-panel"><div class="panel-header"><span class="eyebrow muted">Pembayaran aman</span><h3>Bayar setelah memilih produk</h3><p class="payment-intro">Nomor pembayaran akan tampil otomatis setelah Anda memilih produk.</p></div>
+        <div id="paymentEmpty" class="payment-empty"><div class="payment-icon">🔒</div><strong>Pembayaran belum dibuka</strong><span>Pilih produk terlebih dahulu untuk melihat metode pembayaran.</span></div>
+        <div id="paymentDetails" class="payment-details hidden"><div class="selected-summary"><span>Produk dipilih</span><strong id="paymentProductName">-</strong><b id="paymentProductPrice">Rp 0</b></div><div class="payment-card"><div class="payment-row"><div class="payment-logo dana">D</div><div><span class="payment-label">DANA</span><strong>085177961224</strong></div><button class="copy-btn" data-copy="085177961224" type="button">Salin</button></div><div class="payment-row"><div class="payment-logo gopay">G</div><div><span class="payment-label">GoPay</span><strong>085789963681</strong></div><button class="copy-btn" data-copy="085789963681" type="button">Salin</button></div></div><p class="payment-note">Pastikan nominal transfer sesuai harga produk, lalu kirim bukti pembayaran melalui WhatsApp.</p></div>
+      </div>
+      <form id="orderForm" class="order-form" action="https://formsubmit.co/emailpribhanzz@gmail.com" method="POST"><div class="panel-header"><span class="eyebrow muted">Formulir</span><h3>Isi data pemesanan</h3></div><input type="hidden" name="_captcha" value="false" /><input type="hidden" name="_template" value="table" /><input type="hidden" name="_subject" value="Pesanan Xyroz Baru" /><input type="hidden" id="orderProductName" name="Produk" /><input type="hidden" id="orderProductPrice" name="Harga" /><div class="field-grid"><label>Nama lengkap<input id="customerName" name="Nama" type="text" placeholder="Masukkan nama Anda" required /></label><label>Nomor WhatsApp<input id="customerPhone" name="WhatsApp" type="tel" placeholder="08xxxxxxxxxx" required /></label></div><label>Produk dipilih<input id="selectedProductDisplay" type="text" value="Belum memilih produk" readonly /></label><label>Metode pembayaran<select id="paymentMethod" name="Metode Pembayaran" required><option value="">Pilih metode</option><option value="DANA">DANA</option><option value="GoPay">GoPay</option></select></label><label>Catatan<textarea name="Catatan" rows="4" placeholder="Tulis catatan atau kebutuhan Anda"></textarea></label><button class="primary-btn submit-btn" type="submit">Kirim Pesanan</button><p class="form-note">Data Anda akan diproses setelah pesanan diterima.</p></form>
+    </div></section>
+    <section id="contact" class="contact-section"><div class="container contact-wrap"><div><span class="eyebrow muted">Hubungi kami</span><h3>Butuh bantuan sebelum membeli?</h3></div><div class="contact-actions"><a class="primary-btn" href="https://wa.me/6285177356154" target="_blank" rel="noreferrer">Chat WhatsApp</a><a class="secondary-btn" href="mailto:emailpribhanzz@gmail.com">Email</a></div></div></section>
+  </main><footer class="site-footer"><div class="container footer-wrap"><p>© 2026 Xyroz. Semua hak dilindungi.</p><a href="owner.html">Owner Dashboard</a></div></footer>
+  <script src="script.js"></script>
+</body></html>
