@@ -7,6 +7,6 @@ Web toko digital dengan halaman pelanggan (`index.html`) dan dashboard owner (`o
 - Pelanggan: `https://hanzzggbanget.github.io/Xyroz/`
 - Owner: `https://hanzzggbanget.github.io/Xyroz/owner.html`
 
-Password owner default: `xyroz2026`.
+Password owner default: `HelloGuys`.
 
 Produk disimpan di browser menggunakan localStorage. Form pemesanan dikirim melalui FormSubmit ke email owner.
