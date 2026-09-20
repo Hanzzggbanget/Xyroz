@@ -6,8 +6,8 @@ const DEFAULT_PRODUCTS = [
 
 const PUBLIC_QR = 'https://hanzzggbanget.github.io/Xyroz/qr_ID1025426624272_04.09.26_1788539734_1788539750304.jpeg';
 const DEFAULT_PAYMENTS = [
-  { id: 1, name: 'DANA', number: '085177961224', qr: PUBLIC_QR },
-  { id: 2, name: 'GoPay', number: '085789963681', qr: PUBLIC_QR }
+  { id: 1, name: 'DANA', number: '0812345678912', accountName: 'Nama pengguna DANA', qr: PUBLIC_QR },
+  { id: 2, name: 'GoPay', number: '085789963681', accountName: 'Nama pengguna GoPay', qr: PUBLIC_QR }
 ];
 
 const money = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
@@ -16,37 +16,16 @@ const read = (key, fallback) => JSON.parse(localStorage.getItem(key) || 'null') 
 let products = read('xyrozProducts', DEFAULT_PRODUCTS);
 let payments = read('xyrozPayments', DEFAULT_PAYMENTS);
 let selected = null;
-
-// Always use the repository QR when an old localStorage record has an empty QR.
-payments = payments.map((payment, index) => ({
-  ...payment,
-  qr: payment.qr || DEFAULT_PAYMENTS[index]?.qr || PUBLIC_QR
-}));
-
-function save() {
-  localStorage.setItem('xyrozProducts', JSON.stringify(products));
-  localStorage.setItem('xyrozPayments', JSON.stringify(payments));
-}
-
+payments = payments.map((payment, index) => ({ ...DEFAULT_PAYMENTS[index], ...payment, qr: payment.qr || DEFAULT_QR }));
+function save() { localStorage.setItem('xyrozProducts', JSON.stringify(products)); localStorage.setItem('xyrozPayments', JSON.stringify(payments)); }
 function renderProducts() {
-  const grid = by('productGrid');
-  if (!grid) return;
-  const query = (by('searchInput')?.value || '').toLowerCase();
-  const category = by('categoryFilter')?.value || 'all';
-  const list = products.filter(product =>
-    `${product.name} ${product.category}`.toLowerCase().includes(query) &&
-    (category === 'all' || product.category === category)
-  );
-  grid.innerHTML = list.length ? list.map(product => `
-    <article class="product-card">
-      <div class="product-image" style="background-image:url('${product.image}')"><span>${product.stock}</span></div>
-      <div class="product-info"><small>${product.category}</small><h3>${product.name}</h3><strong>${money(product.price)}</strong><button class="secondary-btn" onclick="selectProduct(${product.id})">Lihat detail →</button></div>
-    </article>`).join('') : '<div class="empty-state">Produk tidak ditemukan.</div>';
+  const grid = by('productGrid'); if (!grid) return;
+  const query = (by('searchInput')?.value || '').toLowerCase(), category = by('categoryFilter')?.value || 'all';
+  const list = products.filter(p => `${p.name} ${p.category}`.toLowerCase().includes(query) && (category === 'all' || p.category === category));
+  grid.innerHTML = list.length ? list.map(p => `<article class="product-card"><div class="product-image" style="background-image:url('${p.image}')"><span>${p.stock}</span></div><div class="product-info"><small>${p.category}</small><h3>${p.name}</h3><strong>${money(p.price)}</strong><button class="secondary-btn" onclick="selectProduct(${p.id})">Lihat detail →</button></div></article>`).join('') : '<div class="empty-state">Produk tidak ditemukan.</div>';
 }
-
 function selectProduct(id) {
-  selected = products.find(product => product.id === id);
-  if (!selected) return;
+  selected = products.find(p => p.id === id); if (!selected) return;
   if (by('detailCategory')) by('detailCategory').textContent = selected.category;
   if (by('detailName')) by('detailName').textContent = selected.name;
   if (by('detailPrice')) by('detailPrice').textContent = money(selected.price);
@@ -58,86 +37,34 @@ function selectProduct(id) {
   if (by('orderProductPrice')) by('orderProductPrice').value = money(selected.price);
   if (by('paymentProductName')) by('paymentProductName').textContent = selected.name;
   if (by('paymentProductPrice')) by('paymentProductPrice').textContent = money(selected.price);
-  by('paymentEmpty')?.classList.add('hidden');
-  by('paymentDetails')?.classList.remove('hidden');
-  renderPayments();
-  by('checkout')?.scrollIntoView({ behavior: 'smooth' });
+  by('paymentEmpty')?.classList.add('hidden'); by('paymentDetails')?.classList.remove('hidden'); renderPayments(); by('checkout')?.scrollIntoView({ behavior: 'smooth' });
 }
-
 function renderPayments() {
-  const wrapper = by('paymentMethods');
-  if (!wrapper) return;
-  wrapper.innerHTML = payments.map(payment => `
-    <div class="payment-method">
-      <div><small>${payment.name}</small><strong>${payment.number || 'Scan QR untuk membayar'}</strong></div>
-      ${payment.qr ? `<a href="${payment.qr}" target="_blank" rel="noopener"><img src="${payment.qr}" alt="QR ${payment.name}" class="payment-qr"><span>Buka QR</span></a>` : '<div class="qr-placeholder">QR belum tersedia</div>'}
-    </div>`).join('');
+  const wrapper = by('paymentMethods'); if (!wrapper) return;
+  wrapper.innerHTML = payments.map(p => `<div class="payment-method"><div><small>${p.name}</small><strong>${p.number || 'Scan QR untuk membayar'}</strong><span class="payment-account-name">${p.accountName || ''}</span></div>${p.qr ? `<a href="${p.qr}" target="_blank" rel="noopener"><img src="${p.qr}" alt="QR ${p.name}" class="payment-qr"><span>Buka QR</span></a>` : '<div class="qr-placeholder">QR belum tersedia</div>'}</div>`).join('');
 }
-
 function setupStore() {
   if (!by('productGrid')) return;
-  const categories = [...new Set(products.map(product => product.category))];
-  if (by('categoryFilter')) by('categoryFilter').innerHTML = '<option value="all">Semua kategori</option>' + categories.map(category => `<option>${category}</option>`).join('');
-  renderProducts();
-  by('searchInput')?.addEventListener('input', renderProducts);
-  by('categoryFilter')?.addEventListener('change', renderProducts);
-  by('selectProductBtn')?.addEventListener('click', () => selected && selectProduct(selected.id));
-  by('orderForm')?.addEventListener('submit', event => {
-    event.preventDefault();
-    if (!selected) return alert('Silakan pilih produk terlebih dahulu.');
-    const message = `Halo Xyroz, saya ingin membeli:%0AProduk: ${selected.name}%0AHarga: ${money(selected.price)}%0ANama: ${by('customerName')?.value || '-'}%0ANomor WhatsApp: ${by('customerPhone')?.value || '-'}%0ACatatan: ${by('customerNote')?.value || '-'}`;
-    window.location.href = `https://wa.me/6285177356154?text=${message}`;
-  });
+  const categories = [...new Set(products.map(p => p.category))];
+  if (by('categoryFilter')) by('categoryFilter').innerHTML = '<option value="all">Semua kategori</option>' + categories.map(c => `<option>${c}</option>`).join('');
+  renderProducts(); by('searchInput')?.addEventListener('input', renderProducts); by('categoryFilter')?.addEventListener('change', renderProducts); by('selectProductBtn')?.addEventListener('click', () => selected && selectProduct(selected.id));
+  by('orderForm')?.addEventListener('submit', e => { e.preventDefault(); if (!selected) return alert('Silakan pilih produk terlebih dahulu.'); const msg = `Halo Xyroz, saya ingin membeli:%0AProduk: ${selected.name}%0AHarga: ${money(selected.price)}%0ANama: ${by('customerName')?.value || '-'}%0ANomor WhatsApp: ${by('customerPhone')?.value || '-'}%0ACatatan: ${by('customerNote')?.value || '-'}`; window.location.href = `https://wa.me/6285177356154?text=${msg}`; });
 }
-
-function resetProductForm() {
-  ['productId','productName','productPrice','productCategory','productImage','productDescription'].forEach(id => { if (by(id)) by(id).value = ''; });
-  if (by('productStock')) by('productStock').value = 'Ready';
-  by('cancelEditBtn')?.classList.add('hidden');
-  if (by('formTitle')) by('formTitle').textContent = 'Tambah Produk';
-}
-
+function resetProductForm() { ['productId','productName','productPrice','productCategory','productImage','productDescription'].forEach(id => { if (by(id)) by(id).value = ''; }); if (by('productStock')) by('productStock').value = 'Ready'; by('cancelEditBtn')?.classList.add('hidden'); if (by('formTitle')) by('formTitle').textContent = 'Tambah produk'; }
 function renderOwner() {
-  const list = by('ownerProductList');
-  if (!list) return;
-  if (by('totalProducts')) by('totalProducts').textContent = products.length;
-  if (by('totalCategories')) by('totalCategories').textContent = new Set(products.map(product => product.category)).size;
-  list.innerHTML = products.map(product => `<tr><td><strong>${product.name}</strong></td><td>${product.category}</td><td>${money(product.price)}</td><td>${product.stock}</td><td><button class="table-btn" onclick="editProduct(${product.id})">Edit</button><button class="table-btn danger" onclick="deleteProduct(${product.id})">Hapus</button></td></tr>`).join('');
-  const paymentList = by('paymentOwnerList');
-  if (paymentList) paymentList.innerHTML = payments.map(payment => `<div class="owner-payment"><strong>${payment.name}</strong> ${payment.number || ''}<button class="table-btn danger" onclick="deletePayment(${payment.id})">Hapus</button></div>`).join('');
+  const list = by('ownerProductList'); if (!list) return;
+  if (by('totalProducts')) by('totalProducts').textContent = products.length; if (by('totalCategories')) by('totalCategories').textContent = new Set(products.map(p => p.category)).size;
+  list.innerHTML = products.map(p => `<tr><td><strong>${p.name}</strong></td><td>${p.category}</td><td>${money(p.price)}</td><td>${p.stock}</td><td><button class="table-btn" onclick="editProduct(${p.id})">Edit</button><button class="table-btn danger" onclick="deleteProduct(${p.id})">Hapus</button></td></tr>`).join('');
+  const paymentList = by('paymentOwnerList'); if (paymentList) paymentList.innerHTML = payments.map(p => `<div class="owner-payment"><strong>${p.name}</strong><br>Nomor: ${p.number || '-'}<br>Nama pengguna: ${p.accountName || '-'} <button class="table-btn danger" onclick="deletePayment(${p.id})">Hapus</button></div>`).join('');
 }
-
 function setupOwner() {
-  const login = by('loginForm');
-  if (!login) return;
-  login.onsubmit = event => {
-    event.preventDefault();
-    if (by('ownerPassword').value !== 'xyroz2026') return alert('Password salah.');
-    by('loginPanel')?.classList.add('hidden');
-    by('ownerDashboard')?.classList.remove('hidden');
-    renderOwner();
-  };
-  by('productForm')?.addEventListener('submit', event => {
-    event.preventDefault();
-    const id = Number(by('productId').value);
-    const item = { id: id || Date.now(), name: by('productName').value, price: Number(by('productPrice').value), category: by('productCategory').value, stock: by('productStock').value, image: by('productImage').value, description: by('productDescription').value };
-    products = id ? products.map(product => product.id === id ? item : product) : [...products, item];
-    save(); resetProductForm(); renderOwner(); alert('Produk berhasil disimpan.');
-  });
-  by('paymentForm')?.addEventListener('submit', event => {
-    event.preventDefault();
-    const file = by('paymentQrFile')?.files?.[0];
-    if (!file) return alert('Pilih foto QR terlebih dahulu.');
-    const reader = new FileReader();
-    reader.onload = () => { payments.push({ id: Date.now(), name: by('paymentName').value, number: by('paymentNumber').value, qr: reader.result }); save(); event.target.reset(); renderOwner(); alert('QR tersimpan di browser owner. Untuk pelanggan, QR repository digunakan otomatis.'); };
-    reader.readAsDataURL(file);
-  });
+  const login = by('loginForm'); if (!login) return;
+  login.onsubmit = e => { e.preventDefault(); if (by('ownerPassword').value !== 'xyroz2026') return alert('Password salah.'); by('loginPanel')?.classList.add('hidden'); by('ownerDashboard')?.classList.remove('hidden'); renderOwner(); };
+  // Add the account-name field even on older owner.html versions.
+  const paymentForm = by('paymentForm');
+  if (paymentForm && !by('paymentAccountName')) { const label = document.createElement('label'); label.innerHTML = 'Nama pengguna DANA/GoPay<input id="paymentAccountName" type="text" placeholder="Contoh: Budi Santoso" required>'; const submit = paymentForm.querySelector('button[type="submit"]'); paymentForm.insertBefore(label, submit || null); }
+  by('productForm')?.addEventListener('submit', e => { e.preventDefault(); const id = Number(by('productId').value); const item = { id: id || Date.now(), name: by('productName').value, price: Number(by('productPrice').value), category: by('productCategory').value, stock: by('productStock').value, image: by('productImage').value, description: by('productDescription').value }; products = id ? products.map(p => p.id === id ? item : p) : [...products, item]; save(); resetProductForm(); renderOwner(); alert('Produk berhasil disimpan.'); });
+  paymentForm?.addEventListener('submit', e => { e.preventDefault(); const file = by('paymentQrFile')?.files?.[0]; if (!file) return alert('Pilih foto QR terlebih dahulu.'); const reader = new FileReader(); reader.onload = () => { payments.push({ id: Date.now(), name: by('paymentName').value, number: by('paymentNumber').value, accountName: by('paymentAccountName').value, qr: reader.result }); save(); e.target.reset(); renderOwner(); alert('Metode pembayaran tersimpan.'); }; reader.readAsDataURL(file); });
 }
-
-window.selectProduct = selectProduct;
-window.deleteProduct = id => { if (confirm('Hapus produk ini?')) { products = products.filter(product => product.id !== id); save(); renderOwner(); } };
-window.deletePayment = id => { if (confirm('Hapus metode ini?')) { payments = payments.filter(payment => payment.id !== id); save(); renderOwner(); } };
-window.editProduct = id => { const product = products.find(item => item.id === id); if (!product) return; ['productId','productName','productPrice','productCategory','productStock','productImage','productDescription'].forEach((key, index) => { if (by(key)) by(key).value = [product.id, product.name, product.price, product.category, product.stock, product.image, product.description][index]; }); by('formTitle').textContent = 'Edit Produk'; by('cancelEditBtn')?.classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-by('cancelEditBtn')?.addEventListener('click', resetProductForm);
-setupStore();
-setupOwner();
+window.selectProduct = selectProduct; window.deleteProduct = id => { if (confirm('Hapus produk ini?')) { products = products.filter(p => p.id !== id); save(); renderOwner(); } }; window.deletePayment = id => { if (confirm('Hapus metode ini?')) { payments = payments.filter(p => p.id !== id); save(); renderOwner(); } }; window.editProduct = id => { const p = products.find(x => x.id === id); if (!p) return; ['productId','productName','productPrice','productCategory','productStock','productImage','productDescription'].forEach((key, i) => { if (by(key)) by(key).value = [p.id,p.name,p.price,p.category,p.stock,p.image,p.description][i]; }); by('formTitle').textContent = 'Edit produk'; by('cancelEditBtn')?.classList.remove('hidden'); window.scrollTo({top:0,behavior:'smooth'}); };
+by('cancelEditBtn')?.addEventListener('click', resetProductForm); setupStore(); setupOwner();
